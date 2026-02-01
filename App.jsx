@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ShieldCheck, MapPin, FileText, UserPlus, ArrowRight } from "lucide-react";
 
@@ -23,7 +23,34 @@ const DISASTER_TYPES = [
   "Other",
 ];
 
-
+const MOCK_RESULTS = [
+  {
+    name: "Rapid Dry & Restore",
+    category: "Water Extraction & Structural Drying",
+    regions: "Southeast (VA/NC/SC)",
+    mobilization: "<24 hours",
+    badges: ["Compliance Verified", "Equipment Ready"],
+    phone: "(555) 014-2031",
+    email: "dispatch@rapiddry.example",
+  },
+  {
+    name: "BlueLine Debris & Haul",
+    category: "Debris Removal & Hauling",
+    regions: "Mid-Atlantic (VA/MD/DC)",
+    mobilization: "24–48 hours",
+    badges: ["Disaster Response Experience", "Regional Response"],
+    phone: "(555) 016-7722",
+    email: "ops@bluelinehaul.example",
+  },
+  {
+    name: "Evergreen Mitigation Services",
+    category: "Wildfire Mitigation & Aftermath",
+    regions: "National (Seasonal)",
+    mobilization: "48+ hours",
+    badges: ["Compliance Verified", "Field-Validated"],
+    phone: "(555) 010-8899",
+    email: "intake@evergreenms.example",
+  },
 ];
 
 function cx(...classes) {
@@ -180,32 +207,11 @@ function Home() {
   const [location, setLocation] = useState("");
   const [queryRan, setQueryRan] = useState(false);
 
- const [providers, setProviders] = useState([]);
-
-useEffect(() => {
-  fetch("https://airtable.com/appqTkwG4v9gpDjl8/shrAUcmQU0GoSZYbu?format=json")
-    .then((res) => res.json())
-    .then((data) => {
-      const records = (data.records || []).map((r) => ({
-        name: r.fields["Provider Name"],
-        category: r.fields["Provider Type"],
-        regions: (r.fields["Regions Served"] || []).join(", "),
-        mobilization: r.fields["Mobilization Window"],
-        badges: r.fields["Badges Earned"] || [],
-        phone: r.fields["Primary Contact Phone"],
-        email: r.fields["Primary Contact Email"],
-      }));
-      setProviders(records);
-    })
-    .catch((err) => {
-      console.error("Error loading providers from Airtable:", err);
-    });
-}, []);
-
+  const results = useMemo(() => {
     // MVP: simple mock filter. Replace with API call.
     if (!queryRan) return [];
     const loc = location.trim().toLowerCase();
-   return providers.filter((r) => {
+    return MOCK_RESULTS.filter((r) => {
       const matchDisaster = disaster === "Other" ? true : true; // mock
       const matchLoc = loc ? r.regions.toLowerCase().includes(loc) : true;
       return matchDisaster && matchLoc;
